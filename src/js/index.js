@@ -78,9 +78,9 @@ function createInfoMarkup(data) {
       <img src="${breedImg.url}" alt="${breed.name}" width=500px height=${
     (breedImg.height * 500) / breedImg.width
   }/>
-      <div class='cat-info-text-wrapper'>
+      <div>
       <h2>${breed.name}</h2>
       <p>${breed.description}</p>
-      <p><b>Temperamrnt: </b>${breed.temperament}</p>
+      <p><b>Temperament: </b>${breed.temperament}</p>
       </div>`;
 }
