@@ -1,65 +1,74 @@
-import SlimSelect from 'slim-select';
-import 'slim-select/styles';
+import iziToast from 'izitoast';
+import 'izitoast/dist/css/iziToast.min.css';
 import { fetchBreeds, fetchCatByBreed } from './cat-api';
 
 const elements = {
   breedSelect: document.querySelector('.breed-select'),
   loader: document.querySelector('.loader'),
-  error: document.querySelector('.error'),
   catInfo: document.querySelector('.cat-info'),
 };
 
-// elements.breedSelect.addEventListener('input', showCatInfo);
-
-let breedSelect;
+elements.breedSelect.addEventListener('input', showCatInfo);
 
 fetchBreeds()
   .then(response => {
-    breedSelect = new SlimSelect({
-      select: '#breed-select',
-      settings: {
-        placeholderText: 'Choose breed',
-        showSearch: false,
-      },
-      data: createSelectMarkup(response.data),
-      events: {
-        afterClose: newVal => {
-          console.log(newVal);
-        },
-      },
-    });
+    elements.breedSelect.innerHTML = createSelectMarkup(response.data);
     elements.breedSelect.classList.remove('visually-hidden');
     elements.loader.classList.add('visually-hidden');
   })
-  .catch(error => {
-    elements.error.classList.remove('visually-hidden');
+  .catch(() => {
     elements.loader.classList.add('visually-hidden');
-    console.log(error);
+    iziToast.show({
+      messageColor: '#fafafa',
+      backgroundColor: '#f56c6c',
+      messageSize: '18px',
+      position: 'bottomLeft',
+      progressBar: false,
+      animateInside: false,
+      transitionIn: 'fadeIn',
+      transitionOut: 'fadeOut',
+      timeout: 3000,
+      targetFirst: false,
+      message: 'Oops! Something went wrong! Try reloading the page!',
+    });
   });
 
-function showCatInfo(value) {
-  elements.error.classList.add('visually-hidden');
+function showCatInfo(evt) {
+  const select = evt.currentTarget;
   elements.loader.classList.remove('visually-hidden');
-  fetchCatByBreed(value)
+  elements.catInfo.innerHTML = '';
+  fetchCatByBreed(select.value)
     .then(response => {
       elements.loader.classList.add('visually-hidden');
       console.log(response.data);
       elements.catInfo.innerHTML = createInfoMarkup(response.data);
     })
-    .catch(error => {
-      elements.error.classList.remove('visually-hidden');
+    .catch(() => {
       elements.loader.classList.add('visually-hidden');
-      elements.catInfo.innerHTML = '';
-      console.log(error);
+      iziToast.show({
+        messageColor: '#fafafa',
+        backgroundColor: '#f56c6c',
+        messageSize: '18px',
+        position: 'bottomLeft',
+        progressBar: false,
+        animateInside: false,
+        transitionIn: 'fadeIn',
+        transitionOut: 'fadeOut',
+        timeout: 3000,
+        targetFirst: false,
+        message: 'Oops! Something went wrong! Try choose another option!',
+      });
     });
 }
 
 function createSelectMarkup(breeds) {
-  const breedsOptions = [{ value: 0, text: 'Choose breed', placeholder: true }];
-  breeds.forEach(({ id, name }) => {
-    breedsOptions.push({ value: id, text: name });
-  });
-  return breedsOptions;
+  return '<option value="0" disabled selected>Choose breed</option>'.concat(
+    breeds
+      .map(breed => {
+        return `<option value="${breed.id}">${breed.name}</option>`;
+      })
+      .join('')
+  );
 }
 
 function createInfoMarkup(data) {
