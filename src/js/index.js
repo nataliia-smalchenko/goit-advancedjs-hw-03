@@ -40,7 +40,6 @@ function showCatInfo(evt) {
   fetchCatByBreed(select.value)
     .then(response => {
       elements.loader.classList.add('visually-hidden');
-      console.log(response.data);
       elements.catInfo.innerHTML = createInfoMarkup(response.data);
     })
     .catch(() => {
